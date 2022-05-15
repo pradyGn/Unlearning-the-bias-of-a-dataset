@@ -69,8 +69,8 @@ class BertClassifier(nn.Module):
          return logits
 
 tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
-biased_model = torch.load("/content/drive/MyDrive/DLSProject_0514/snli_finetuned_biased.pth")
-model = torch.load("/content/drive/MyDrive/DLSProject_0514/snli_debiased_mlmTrained.pth")
+biased_model = torch.load("./finetunedBiasedModel.pth")
+model = torch.load("./MLMPre-trainedDebiasedModel.pth")
 
 model.to(device)
 biased_model.to(device)
@@ -172,9 +172,7 @@ loss_fn = nn.CrossEntropyLoss()
 def train(model, baised_model, train_dataloader, val_dataloader=None, epochs=4, evaluation=False):
     print("Start training...\n")
     for epoch_i in range(epochs):
-        # =======================================
-        #               Training
-        # =======================================
+        # Training
 
         print(f"{'Epoch':^7} | {'Batch':^7} | {'Train Loss':^12} | {'Val Loss':^10} | {'Val Acc':^9} | {'Elapsed':^9}")
         print("-"*70)
@@ -194,10 +192,7 @@ def train(model, baised_model, train_dataloader, val_dataloader=None, epochs=4, 
             logits_debiased = model(b_input_ids, b_attn_mask)
             logist_biased = baised_model(b_input_ids, b_attn_mask)
 
-            #print(logist_biased)
-
             logits = logits_debiased + logist_biased
-
 
             loss = loss_fn(logits, b_labels)
             batch_loss += loss.item()
@@ -221,9 +216,7 @@ def train(model, baised_model, train_dataloader, val_dataloader=None, epochs=4, 
         avg_train_loss = total_loss / len(train_dataloader)
 
         print("-"*70)
-        # =======================================
-        #               Evaluation
-        # =======================================
+        # Evaluation
         if evaluation == True:
             val_loss, val_accuracy = evaluate(model, val_dataloader)
 
@@ -239,8 +232,6 @@ def train(model, baised_model, train_dataloader, val_dataloader=None, epochs=4, 
 def evaluate(model, val_dataloader):
     model.eval()
 
-    model.eval()
-
     # Tracking variables
     val_accuracy = []
     val_loss = []
@@ -254,8 +245,7 @@ def evaluate(model, val_dataloader):
 
         loss = loss_fn(logits, b_labels)
         val_loss.append(loss.item())
-
-        #print(logits)
+        
         preds = torch.argmax(logits, dim=1).flatten()
 
         predictions.append(preds)
@@ -272,7 +262,7 @@ set_seed(42)
 debiased_model, optimizer, scheduler = initialize_model(epochs=3)
 train(debiased_model, biased_model, snli_train_dataloader, snli_dev_dataloader, epochs=2, evaluation=True)
 
-torch.save(debiased_model, "/content/drive/MyDrive/DLSProject_0514/debiased_snli_final.pth")
+torch.save(debiased_model, "./debiasedFinetunedModel.pth")
 
 val_loss, val_accuracy = evaluate(debiased_model, snli_dev_dataloader)
 print(val_accuracy)
