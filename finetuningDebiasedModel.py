@@ -42,7 +42,7 @@ device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cp
 class BertClassifier(nn.Module):
      def __init__(self, freeze_bert=False):
          super(BertClassifier, self).__init__()
-         D_in, H, D_out = 30522, 32, 3
+         D_in, H, D_out = 30522, 32, 3  # MAKE 30522, 32, 2 for HANS dataset.
  
          self.bert = model
  
