@@ -20,7 +20,7 @@ import time
 
 snli_train = []
 
-with jsonlines.open('/content/drive/MyDrive/DLSProject_0514/snli_1.0/snli_1.0_train.jsonl') as f:
+with jsonlines.open('./snli_1.0/snli_1.0_train.jsonl') as f: #add appropriate path to datasets
     for line in f.iter():
         s1 = line["sentence1"]
         s2 = line["sentence2"]
@@ -29,7 +29,7 @@ with jsonlines.open('/content/drive/MyDrive/DLSProject_0514/snli_1.0/snli_1.0_tr
 
 snli_dev = []
 
-with jsonlines.open('/content/drive/MyDrive/DLSProject_0514/snli_1.0/snli_1.0_dev.jsonl') as f:
+with jsonlines.open('./snli_1.0/snli_1.0_dev.jsonl') as f: #add appropriate path to datasets
     for line in f.iter():
         s1 = line["sentence1"]
         s2 = line["sentence2"]
@@ -39,7 +39,7 @@ with jsonlines.open('/content/drive/MyDrive/DLSProject_0514/snli_1.0/snli_1.0_de
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
 tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
-model = torch.load("/content/drive/MyDrive/DLSProject_0514/snli_5e-5.pth")
+model = torch.load("./MLMPre-trainedBiasedModel.pth") #add path to MLM Pre-trained Biased model.
 
 model.to(device)
 
@@ -136,7 +136,7 @@ class BertClassifier(nn.Module):
          return logits
 
 def initialize_model(epochs=4):
-    bert_classifier = BertClassifier(freeze_bert=True)
+    bert_classifier = BertClassifier(freeze_bert=False)
 
     bert_classifier.to(device)
 
@@ -164,7 +164,6 @@ def train(model, train_dataloader, val_dataloader=None, epochs=4, evaluation=Fal
     print("Start training...\n")
     for epoch_i in range(epochs):
         # Training
-
         print(f"{'Epoch':^7} | {'Batch':^7} | {'Train Loss':^12} | {'Val Loss':^10} | {'Val Acc':^9} | {'Elapsed':^9}")
         print("-"*70)
 
@@ -250,5 +249,5 @@ set_seed(42)
 biased_classifier, optimizer, scheduler = initialize_model(epochs=3)
 train(biased_classifier, snli_train_dataloader, snli_dev_dataloader, epochs=6)
 
-torch.save(biased_classifier, "/content/drive/MyDrive/DLSProject_0514/snli_finetuned_biased.pth")
+torch.save(biased_classifier, "./finetunedBiasedModel.pth")
 
