@@ -18,3 +18,12 @@ The training architecture looks as follows:
 
 ![alt text](https://raw.githubusercontent.com/pradyGn/Unlearning-the-bias-of-a-dataset/main/Architecture.png)
 
+
+The python scripts can be run using the following commands (we highly recommend running it using batch scheduler on HPC). The scripts need to be ran in the following order.
+
+```
+python MLMPre-trainingBiasedModel.py
+python finetuningBiasedModel.py
+python MLMPre-trainingDebiasedModel.py
+python finetuningDebiasedModel.py
+```
