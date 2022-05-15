@@ -50,8 +50,12 @@ python ./finetuningDebiasedModel.py
 
 ![image](https://user-images.githubusercontent.com/34334397/168493713-879d46ca-8dea-4566-8e74-caa553513992.png)  
 
-![image](https://user-images.githubusercontent.com/34334397/168493739-e9ba2782-9d60-4725-874f-518047a44a78.png)  
+![image](https://user-images.githubusercontent.com/34334397/168493801-83681a98-e5b3-4c99-9a01-33778a64187a.png)  
 
-![image](https://user-images.githubusercontent.com/34334397/168493775-78b72f5e-3580-40be-9a4a-c95ff9ad0011.png)
+An ensemble model is also built by masking random sets of words in the hypothesis sentences, and conducting multiple such experiments and averaging the results. The accuracy of this model, along with the other models, is summarized below:
+
+![image](https://user-images.githubusercontent.com/34334397/168493775-78b72f5e-3580-40be-9a4a-c95ff9ad0011.png)  
+
+
 
 
