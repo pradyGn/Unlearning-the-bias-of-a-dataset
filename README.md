@@ -28,11 +28,11 @@ The HANS dataset can be accesed through this link: https://github.com/hansanon/h
 
 ###### Script's description:
 
-MLMPre-trainingBiasedModel.py pre-trains a Biased BERT model.
-finetuningBiasedModel.py finetunes the pre-trained Biased BERT model.
+MLMPre-trainingBiasedModel.py pre-trains a Biased BERT model.    
+finetuningBiasedModel.py finetunes the pre-trained Biased BERT model.   
 
-MLMPre-trainingDebiasedModel.py pre-trains a Deiased BERT model.
-finetuningDebiasedModel.py finetunes the pre-trained Debiased BERT model.
+MLMPre-trainingDebiasedModel.py pre-trains a Deiased BERT model.   
+finetuningDebiasedModel.py finetunes the pre-trained Debiased BERT model.   
 
 ###### Example commands
 The python scripts can be run using the following commands (we highly recommend running it using batch scheduler on HPC). The scripts need to be ran in the following order. The implementation shown is for Stanford NLI dataset. However, by simply changing the path of the dataset (to MNLI) at the begining of each file should provide results for respective datasets.
