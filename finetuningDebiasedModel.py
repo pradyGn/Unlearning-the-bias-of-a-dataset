@@ -127,6 +127,21 @@ def numerize_y(y):
       numed_y.append(2)
   return numed_y
 
+'''
+HANS numerize_y function:
+
+def numerize_y(y):
+    numerized_y = []
+	for label in y:
+		if label == "entailment":
+			numerized_y.append(0)
+		else:
+			numerized_y.append(1)
+     return numerized_y
+
+'''
+
+
 snli_train_y = numerize_y(snli_train_y)
 snli_dev_y = numerize_y(snli_dev_y)
 
