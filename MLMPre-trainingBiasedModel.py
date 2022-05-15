@@ -19,7 +19,7 @@ import re
 
 snli_train = []
 
-with jsonlines.open('/content/drive/MyDrive/DLSProject_0514/snli_1.0/snli_1.0_train.jsonl') as f:
+with jsonlines.open('./snli_1.0/snli_1.0_train.jsonl') as f: #add appropriate path to load the .jsonl file from.
     for line in f.iter():
         s1 = line["sentence1"]
         s2 = line["sentence2"]
@@ -27,12 +27,10 @@ with jsonlines.open('/content/drive/MyDrive/DLSProject_0514/snli_1.0/snli_1.0_tr
         snli_train.append([[s1, s2], label])
 
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-
 torch.cuda.empty_cache()
 
 tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
 model = BertForMaskedLM.from_pretrained("bert-base-uncased")
-
 model.to(device)
 
 def getsentence2(dataset):
@@ -44,20 +42,12 @@ def getsentence2(dataset):
   return X_train, y_train
 
 snli_train, snli_y = getsentence2(snli_train)
-
 snli_inputs = tokenizer(snli_train, return_tensors='pt', max_length=64, truncation=True, padding='max_length')
-
-snli_inputs.keys()
-
 snli_inputs['labels'] = snli_inputs.input_ids.detach().clone()
-
-snli_inputs.keys()
 
 rand = torch.rand(snli_inputs.input_ids.shape)
 mask_arr = (rand < 0.15) * (snli_inputs.input_ids != 101) * \
            (snli_inputs.input_ids != 102) * (snli_inputs.input_ids != 0)
-
-mask_arr
 
 selection = []
 
@@ -68,8 +58,6 @@ for i in range(snli_inputs.input_ids.shape[0]):
 
 for i in range(snli_inputs.input_ids.shape[0]):
     snli_inputs.input_ids[i, selection[i]] = 103
-
-snli_inputs.input_ids
 
 class snliDataset(torch.utils.data.Dataset):
     def __init__(self, encodings):
@@ -102,3 +90,4 @@ def train(model, epochs, DataLoader, optim):
           loop.set_postfix(loss=loss.item())
 
 train(model, 2, snliDataLoader, optim)
+torch.save(model, "./") #add appropriate path to save the model.
