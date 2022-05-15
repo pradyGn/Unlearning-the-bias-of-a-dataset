@@ -20,7 +20,7 @@ from transformers import AdamW, get_linear_schedule_with_warmup
 
 snli_train = []
 
-with jsonlines.open('/content/drive/MyDrive/DLSProject_0514/snli_1.0/snli_1.0_train.jsonl') as f:
+with jsonlines.open('./snli_1.0/snli_1.0_train.jsonl') as f:
     for line in f.iter():
         s1 = line["sentence1"]
         s2 = line["sentence2"]
@@ -29,7 +29,7 @@ with jsonlines.open('/content/drive/MyDrive/DLSProject_0514/snli_1.0/snli_1.0_tr
 
 snli_dev = []
 
-with jsonlines.open('/content/drive/MyDrive/DLSProject_0514/snli_1.0/snli_1.0_dev.jsonl') as f:
+with jsonlines.open('./snli_1.0/snli_1.0_dev.jsonl') as f:
     for line in f.iter():
         s1 = line["sentence1"]
         s2 = line["sentence2"]
@@ -144,4 +144,4 @@ def train(model, epochs, DataLoader, optim):
 
 train(model, 2, snliDataLoader, optim)
 
-torch.save(model, "./debiasedMLMPre-trainedModel.pth")
+torch.save(model, "./MLMPre-trainedDebiasedModel.pth")
