@@ -20,7 +20,7 @@ import time
 
 HANS_train = []
 
-with jsonlines.open('/content/drive/MyDrive/DLSProject_0514/multinli_1.0/multinli_1.0_train.jsonl') as f:
+with jsonlines.open('./heuristics_train_set.jsonl') as f:
     for line in f.iter():
         s1 = line["sentence1"]
         s2 = line["sentence2"]
@@ -29,7 +29,7 @@ with jsonlines.open('/content/drive/MyDrive/DLSProject_0514/multinli_1.0/multinl
 
 HANS_dev = []
 
-with jsonlines.open('/content/drive/MyDrive/DLSProject_0514/multinli_1.0/multinli_1.0_dev_matched.jsonl') as f:
+with jsonlines.open('./heuristics_evaluation_set.jsonl') as f:
     for line in f.iter():
         s1 = line["sentence1"]
         s2 = line["sentence2"]
@@ -41,7 +41,7 @@ device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cp
 class BertClassifier(nn.Module):
      def __init__(self, freeze_bert=False):
          super(BertClassifier, self).__init__()
-         D_in, H, D_out = 30522, 32, 1
+         D_in, H, D_out = 30522, 32, 2
  
          self.bert = model
  
@@ -67,7 +67,7 @@ class BertClassifier(nn.Module):
  
          return logits
 
-model = 0 #import mnli biased MLM trained model
+model = torch.load("MLMPre-trainedBiasedModel") #import MNLI biased MLM trained model
 tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
 
 model.to(device)
@@ -80,9 +80,9 @@ def getsentence2(dataset):
     y_train.append(dataset[i][1])
   return X_train, y_train
 
-snli_train, snli_y = getsentence2(HANS_train)
+hans_train, hans_y = getsentence2(HANS_train)
 
-class snliDataset(torch.utils.data.Dataset):
+class hansDataset(torch.utils.data.Dataset):
     def __init__(self, encodings):
         self.encodings = encodings
     def __getitem__(self, idx):
@@ -91,59 +91,46 @@ class snliDataset(torch.utils.data.Dataset):
         return len(self.encodings.input_ids)
 
 
-snli_train_X = snli_train
-snli_train_y = snli_y
-snli_dev_X, snli_dev_y = getsentence2(HANS_dev)
+hans_train_X = hans_train
+hans_train_y = hans_y
+hans_dev_X, hans_dev_y = getsentence2(HANS_dev)
 
-snli_train_inputs = tokenizer(snli_train_X, max_length=64, truncation=True, padding='max_length')
-snli_dev_inputs = tokenizer(snli_dev_X, max_length=64, truncation=True, padding='max_length')
+hans_train_inputs = tokenizer(hans_train_X, max_length=64, truncation=True, padding='max_length')
+hans_dev_inputs = tokenizer(hans_dev_X, max_length=64, truncation=True, padding='max_length')
 
-snli_train_inputs.input_ids = torch.Tensor(snli_train_inputs.input_ids).long()
-snli_train_inputs.token_type_ids = torch.Tensor(snli_train_inputs.token_type_ids).long()
-snli_train_inputs.attention_mask = torch.Tensor(snli_train_inputs.attention_mask).long()
+hans_train_inputs.input_ids = torch.Tensor(hans_train_inputs.input_ids).long()
+hans_train_inputs.token_type_ids = torch.Tensor(hans_train_inputs.token_type_ids).long()
+hans_train_inputs.attention_mask = torch.Tensor(hans_train_inputs.attention_mask).long()
 
-snli_dev_inputs.input_ids = torch.Tensor(snli_dev_inputs.input_ids).long()
-snli_dev_inputs.token_type_ids = torch.Tensor(snli_dev_inputs.token_type_ids).long()
-snli_dev_inputs.attention_mask = torch.Tensor(snli_dev_inputs.attention_mask).long()
-
-"""
-def numerize_y(y):
-  numed_y = []
-  for label in y:
-    if label == "contradiction":
-      numed_y.append(0)
-    elif label == "entailment":
-      numed_y.append(1)
-    else:
-      numed_y.append(2)
-  return numed_y
-"""
+hans_dev_inputs.input_ids = torch.Tensor(hans_dev_inputs.input_ids).long()
+hans_dev_inputs.token_type_ids = torch.Tensor(hans_dev_inputs.token_type_ids).long()
+hans_dev_inputs.attention_mask = torch.Tensor(hans_dev_inputs.attention_mask).long()
 
 def numerize_y(y):
-	numerized_y = []
-	for label in y:
-		if label == "entailment":
-			numerized_y.append(0)
-		else:
-			numerized_y.append(1)
-	return numerized_y
+    numerized_y = []
+    for label in y:
+        if label == "entailment":
+	    numerized_y.append(0)
+	else:
+	    numerized_y.append(1)
+    return numerized_y
   
-snli_train_y = numerize_y(snli_train_y)
-snli_dev_y = numerize_y(snli_dev_y)
+hans_train_y = numerize_y(hans_train_y)
+hans_dev_y = numerize_y(hans_dev_y)
 
-Trainlabel_tensor = torch.Tensor(snli_train_y).long()
-Testlabel_tensor = torch.Tensor(snli_dev_y).long()
+Trainlabel_tensor = torch.Tensor(hans_train_y).long()
+Testlabel_tensor = torch.Tensor(hans_dev_y).long()
 
-snli_train_inputs['labels'] = Trainlabel_tensor
-snli_dev_inputs['labels'] = Testlabel_tensor
+hans_train_inputs['labels'] = Trainlabel_tensor
+hans_dev_inputs['labels'] = Testlabel_tensor
 
-snli_train_data = TensorDataset(snli_train_inputs.input_ids, snli_train_inputs.attention_mask, snli_train_inputs.labels)
-train_sampler = RandomSampler(snli_train_data)
-snli_train_dataloader = DataLoader(snli_train_data, sampler=train_sampler, batch_size=32)
+hans_train_data = TensorDataset(hans_train_inputs.input_ids, hans_train_inputs.attention_mask, hans_train_inputs.labels)
+train_sampler = RandomSampler(hans_train_data)
+hans_train_dataloader = DataLoader(hans_train_data, sampler=train_sampler, batch_size=32)
 
-snli_dev_data = TensorDataset(snli_dev_inputs.input_ids, snli_dev_inputs.attention_mask, snli_dev_inputs.labels)
-dev_sampler = RandomSampler(snli_dev_data)
-snli_dev_dataloader = DataLoader(snli_dev_data, sampler=dev_sampler, batch_size=32)
+hans_dev_data = TensorDataset(hans_dev_inputs.input_ids, hans_dev_inputs.attention_mask, hans_dev_inputs.labels)
+dev_sampler = RandomSampler(hans_dev_data)
+hans_dev_dataloader = DataLoader(hans_dev_data, sampler=dev_sampler, batch_size=32)
 
 
 def initialize_model(epochs=4):
@@ -156,7 +143,7 @@ def initialize_model(epochs=4):
                       eps=1e-8
                       )
 
-    total_steps = len(snli_train_dataloader) * epochs
+    total_steps = len(hans_train_dataloader) * epochs
 
     scheduler = get_linear_schedule_with_warmup(optimizer,
                                                 num_warmup_steps=0,
@@ -164,7 +151,7 @@ def initialize_model(epochs=4):
     return bert_classifier, optimizer, scheduler
 
 
-loss_fn = nn.BCELoss()
+loss_fn = nn.CrossEntropyLoss()
 
 def set_seed(seed_value=42):
     random.seed(seed_value)
@@ -175,9 +162,7 @@ def set_seed(seed_value=42):
 def train(model, train_dataloader, val_dataloader=None, epochs=4, evaluation=False):
     print("Start training...\n")
     for epoch_i in range(epochs):
-        # =======================================
-        #               Training
-        # =======================================
+        # Training
 
         print(f"{'Epoch':^7} | {'Batch':^7} | {'Train Loss':^12} | {'Val Loss':^10} | {'Val Acc':^9} | {'Elapsed':^9}")
         print("-"*70)
@@ -218,9 +203,7 @@ def train(model, train_dataloader, val_dataloader=None, epochs=4, evaluation=Fal
         avg_train_loss = total_loss / len(train_dataloader)
 
         print("-"*70)
-        # =======================================
-        #               Evaluation
-        # =======================================
+        # Evaluation
         if evaluation == True:
             val_loss, val_accuracy = evaluate(model, val_dataloader)
 
@@ -267,11 +250,9 @@ def evaluate(model, val_dataloader):
 
 set_seed(42)
 biased_model_HANS, optimizer, scheduler = initialize_model(epochs=2)
-train(biased_model_HANS, snli_train_dataloader, snli_dev_dataloader, epochs=2)
+train(biased_model_HANS, hans_train_dataloader, hans_dev_dataloader, epochs=2)
 
-torch.save(biased_model_HANS, "path")
-
-print("Hello World!")
+torch.save(biased_model_HANS, "./BiasedModelHANS.pth")
 
 
 
