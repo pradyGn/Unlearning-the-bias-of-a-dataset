@@ -13,25 +13,27 @@ There are three approaches by which we have tried to reducing dataset bias.
 3. A number of models have been finetuned by masking 15% percetage of words in the hypothesis sentences (every model has a different set of words masked). We have masked these words rather than removing it so that the model retains it's semantic understanding capabilities without giving away the actual meaning of that particular word. The motivation behind this approach is that, each word (in the hypothese) contributes towards the bias and we want to reduce the total contribution towards bias by averaging it.
 
 ###### Models: 
-Bidirectional Encoder Representations from Transformers (BERT) (Devlin, 2019)
+Bidirectional Encoder Representations from Transformers (BERT) (Devlin, 2019)  
 
 ###### Datasets: 
-The two (challenge) datasets which have been used to test the implementation are Stanford Natural Language Inference (SNLI) (Bowman, 2015)2 and Multi-Genre Natural Language Inference (MNLI) (Williams, 2017)3.
+The two datasets which have been used to test the implementation are Stanford Natural Language Inference (SNLI) (Bowman, 2015)2 and Multi-Genre Natural Language Inference (MNLI) (Williams, 2017)3. The challenge dataset useded by He et al is the HANS dataset.  
+
+The Stanford NLI dataset can be accesed through this link: https://nlp.stanford.edu/projects/snli/  
+The Multi Genre NLI dataset can be accesed through this link: https://cims.nyu.edu/~sbowman/multinli/  
+The HANS dataset can be accesed through this link: https://github.com/hansanon/hans  
 
 ###### The training architecture looks as follows:
 
 ![alt text](https://raw.githubusercontent.com/pradyGn/Unlearning-the-bias-of-a-dataset/main/Architecture.png)
 
-The Stanford NLI dataset can be accesed through this link: https://nlp.stanford.edu/projects/snli/
-The Multi Genre NLI dataset can be accesed through this link: https://cims.nyu.edu/~sbowman/multinli/
-The HANS dataset can be accesed through this link: https://github.com/hansanon/hans
-
-###### Script's description:
+###### Scripts description:
 
 MLMPre-trainingBiasedModel.py pre-trains a Biased BERT model.    
+
 finetuningBiasedModel.py finetunes the pre-trained Biased BERT model.   
 
 MLMPre-trainingDebiasedModel.py pre-trains a Deiased BERT model.   
+
 finetuningDebiasedModel.py finetunes the pre-trained Debiased BERT model.   
 
 ###### Example commands
