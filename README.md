@@ -46,6 +46,8 @@ python ./MLMPre-trainingDebiasedModel.py
 python ./finetuningDebiasedModel.py
 ```
 
+For HANS dataset debiased model finetuning, make the suggested changes in the finetuningDebiasedModel.py script (in BertClassifier class). Also, use the commented HANSnumerized_y function in the finetuningDebiasedModel.py script script which is commented by default.
+
 ###### Results
 
 ![image](https://user-images.githubusercontent.com/34334397/168493713-879d46ca-8dea-4566-8e74-caa553513992.png)  
