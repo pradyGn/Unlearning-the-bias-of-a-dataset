@@ -191,7 +191,8 @@ def train(model, baised_model, train_dataloader, val_dataloader=None, epochs=4, 
 
             logits_debiased = model(b_input_ids, b_attn_mask)
             logist_biased = baised_model(b_input_ids, b_attn_mask)
-
+            
+            # Adding the logist from both biased and unbiased model to improve performance.
             logits = logits_debiased + logist_biased
 
             loss = loss_fn(logits, b_labels)
